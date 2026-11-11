@@ -44,7 +44,13 @@ jobs:
           if ! git diff --quiet -- public/data; then
             git add public/data
             git commit -m "chore(data): scheduled snapshot update $(date -u +%Y-%m-%d)"
-            git push
+            # 并发或排队的运行可能已先推送快照提交（后启动者的 checkout 停在触发时旧提交）：
+            # push 被拒时 rebase 到 origin/main 重试一次；仍失败只告警，不阻塞本次部署
+            # （本次收集的数据已包含在本次构建产物中）。
+            if ! git push; then
+              echo "::warning::Snapshot push rejected; rebasing onto origin/main and retrying"
+              git pull --rebase origin main && git push
+            fi || echo "::warning::Snapshot commit push failed (a concurrent run won); deploying with this run's data anyway."
           else
             echo "No snapshot changes; skip commit."
           fi
