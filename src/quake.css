@@ -771,6 +771,22 @@ button {
   width: auto;
 }
 
+/* Cesium CreditDisplay 注入 creditContainer 的内层 .cesium-widget-credits 在 widgets.css 中默认
+   position:absolute;bottom:0;left:0（仅 .cesium-viewer 后代才被改回 static）。页脚不在
+   .cesium-viewer 内，内层容器会钉到 .quake-credit 左下角与数据来源文字叠印，故在此改回流式布局。 */
+.quake-credit-box .cesium-widget-credits {
+  position: static;
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  bottom: auto;
+  left: auto;
+  padding-right: 0;
+  color: inherit;
+  text-shadow: none;
+}
+
 /* Cesium 署名已移入页脚 .quake-credit-box（Viewer creditContainer），默认浮动署名条不再生成 */
 
 /* ---------- 加载 / 错误 覆盖层 ---------- */
