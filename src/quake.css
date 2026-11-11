@@ -734,7 +734,11 @@ button {
   left: 10px;
   bottom: 4px;
   z-index: 25;
-  max-width: calc(100% - 240px);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  max-width: calc(100% - 24px);
   padding: 3px 8px;
   background: rgba(9, 9, 9, 0.72);
   border-radius: 6px;
@@ -747,17 +751,27 @@ button {
   text-decoration: underline;
 }
 
-.quake-credit code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+/* Cesium CreditDisplay 的署名（Esri 影像链接、Cesium 标识等）内联进页脚 */
+.quake-credit-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
   font-size: 10px;
-  color: var(--text);
+  color: var(--muted);
 }
 
-/* Cesium 署名条保持可见（不移除供应商署名），避免与页脚重叠 */
-.quake-map-area .cesium-viewer-bottom {
-  right: 8px;
-  bottom: 2px;
+.quake-credit-box a {
+  color: var(--text);
+  text-decoration: underline;
 }
+
+.quake-credit-box img {
+  height: 12px;
+  width: auto;
+}
+
+/* Cesium 署名已移入页脚 .quake-credit-box（Viewer creditContainer），默认浮动署名条不再生成 */
 
 /* ---------- 加载 / 错误 覆盖层 ---------- */
 

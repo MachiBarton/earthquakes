@@ -40,6 +40,8 @@ interface MapCanvasProps {
   showPlates: boolean;
   /** 板块边界快照（PB2002；空数组时图层仅无边界线，板块名注记仍可用）。 */
   plateLines: readonly PlateLine[];
+  /** Cesium 署名容器（页脚空节点）：取代默认浮动署名条，避免与数据来源条重叠。 */
+  creditContainerRef?: { readonly current: HTMLDivElement | null };
   onHoverChange: (info: MapPickInfo | null) => void;
   onPinChange: (info: MapPickInfo | null) => void;
 }
@@ -181,6 +183,7 @@ export default function MapCanvas({
   cityPlaces,
   showPlates,
   plateLines,
+  creditContainerRef,
   onHoverChange,
   onPinChange,
 }: MapCanvasProps) {
@@ -228,6 +231,9 @@ export default function MapCanvas({
       // 空闲不重绘；hover 高亮与图元重建后需手动 scene.requestRender()。
       requestRenderMode: true,
       maximumRenderTimeChange: Infinity,
+      // 署名重定向到页脚空容器（creditContainerRef）：地图左下不再生成默认浮动署名条，
+      // Esri/Cesium 署名改在数据来源行内展示（署名不移除）。
+      creditContainer: creditContainerRef?.current ?? undefined,
     });
     viewerRef.current = viewer;
     // 地震带叠加层用独立 DataSource：聚合 effect 的 entities.removeAll() 只清主集合，

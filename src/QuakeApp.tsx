@@ -45,6 +45,8 @@ export default function QuakeApp() {
   const [plateLines, setPlateLines] = useState<readonly PlateLine[]>([]);
   const [panelOpen, setPanelOpen] = useState(() => window.innerWidth >= 760);
   const mapAreaRef = useRef<HTMLElement | null>(null);
+  // Cesium 署名容器：页脚内空 div，由 Cesium CreditDisplay 直接写入（React 不管理其内部节点）。
+  const creditBoxRef = useRef<HTMLDivElement | null>(null);
   const [mapSize, setMapSize] = useState({ width: 0, height: 0 });
 
   // 数据加载：AbortController 超时（data.ts 内 10s）+ 卸载时 abort。
@@ -209,6 +211,7 @@ export default function QuakeApp() {
             cityPlaces={cityPlaces}
             showPlates={showPlates}
             plateLines={plateLines}
+            creditContainerRef={creditBoxRef}
             onHoverChange={setHover}
             onPinChange={setPin}
           />
@@ -237,18 +240,22 @@ export default function QuakeApp() {
 
           <Legend includeOverseas={filters?.scope === 'all'} />
 
-          {snapshot && (
-            <footer className="quake-credit">
-              数据来源：
-              <a href={snapshot.source || CEIC_URL} target="_blank" rel="noopener noreferrer">
-                {snapshot.sourceName || '中国地震台网中心（CEIC）'}
-              </a>
-              {' · 快照时间 '}
-              {formatFetchedAt(snapshot.fetchedAt)}
-              {' · 板块边界 PB2002（Bird, 2003） · 运行 '}
-              <code>npm run fetch:quakes</code> / <code>fetch:plates</code> 更新数据
-            </footer>
-          )}
+          <footer className="quake-credit">
+            {snapshot && (
+              <span>
+                数据来源：
+                <a href={snapshot.source || CEIC_URL} target="_blank" rel="noopener noreferrer">
+                  {snapshot.sourceName || '中国地震台网中心（CEIC）'}
+                </a>
+                {' · 快照时间 '}
+                {formatFetchedAt(snapshot.fetchedAt)}
+                {' · 板块边界 PB2002（Bird, 2003）'}
+              </span>
+            )}
+            {/* Cesium 供应商署名（Esri 影像等）由 CreditDisplay 渲染进此空容器，
+                取代地图左下默认浮动署名条，与数据来源同行不重叠；署名不移除。 */}
+            <div ref={creditBoxRef} className="quake-credit-box" aria-label="地图供应商署名" />
+          </footer>
         </section>
       </main>
 
