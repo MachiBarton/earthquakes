@@ -28,7 +28,7 @@ function formatFetchedAt(iso: string): string {
 }
 
 /**
- * 2026 年 1 月至今全国地震分布页面根组件：
+ * 全国地震分布页面根组件（标题/区间/页签标题随数据源动态修正）：
  * 数据加载（超时/错误态）→ 过滤 → 聚合 → 地图图元 + hover/钉住 tooltip + 统计面板。
  */
 export default function QuakeApp() {
@@ -131,6 +131,26 @@ export default function QuakeApp() {
   const clusters = useMemo(() => groupByLocation(filteredEvents), [filteredEvents]);
   const stats = useMemo(() => computeStats(filteredEvents), [filteredEvents]);
 
+  // 头部标题与区间由数据源动态推导：标题年份取 rangeStart，
+  // 区间取 events 实际首末地震日期（events 按时间倒序）；空则回退快照区间。
+  const coverage = useMemo(() => {
+    if (!snapshot) {
+      return null;
+    }
+    const events = snapshot.events;
+    const first =
+      events.length > 0 ? events[events.length - 1].timeText.slice(0, 10) : snapshot.rangeStart;
+    const last = events.length > 0 ? events[0].timeText.slice(0, 10) : snapshot.rangeEnd;
+    return { first, last, year: snapshot.rangeStart.slice(0, 4) };
+  }, [snapshot]);
+
+  // 浏览器页签标题同样按数据源年份修正。
+  useEffect(() => {
+    if (coverage) {
+      document.title = `${coverage.year} 全国地震分布 · CEIC 数据`;
+    }
+  }, [coverage]);
+
   // 钉住同一聚合时不再叠加 hover tooltip。
   const hoverTip = hover && !(pin && pin.cluster.key === hover.cluster.key) ? hover : null;
 
@@ -151,10 +171,12 @@ export default function QuakeApp() {
             <PanelLeftOpen size={16} aria-hidden="true" />
           )}
         </button>
-        <h1 className="quake-title">2026 年 1 月至今全国地震分布</h1>
-        {snapshot && (
+        <h1 className="quake-title">
+          {coverage ? `${coverage.year} 年 1 月至今全国地震分布` : '全国地震分布'}
+        </h1>
+        {snapshot && coverage && (
           <p className="quake-summary">
-            {snapshot.rangeStart} ~ {snapshot.rangeEnd} · 快照 {snapshot.count} 条 · 当前过滤{' '}
+            {coverage.first} ~ {coverage.last} · 快照 {snapshot.count} 条 · 当前过滤{' '}
             {filteredEvents.length} 条 / {clusters.length} 个地区
           </p>
         )}
