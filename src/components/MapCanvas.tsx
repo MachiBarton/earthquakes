@@ -389,6 +389,8 @@ export default function MapCanvas({
       platesSourceRef.current = null;
       clustersByKeyRef.current = new Map();
     };
+    // 挂载期一次性创建 Viewer；creditContainerRef 为父组件稳定 ref 对象，仅在挂载时读取一次其 current。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // clusters 变化：重建全部聚合图元（光晕 + 核心点，无文字标签）并请求重绘。
