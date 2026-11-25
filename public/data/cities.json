@@ -1,7 +1,7 @@
 {
   "source": "https://geo.datav.aliyun.com/areas_v3/",
   "sourceName": "阿里云 DataV GeoAtlas（行政区划中心点）",
-  "fetchedAt": "2026-11-24T06:08:40.328Z",
+  "fetchedAt": "2026-11-25T04:57:02.089Z",
   "counts": {
     "city": 329,
     "county": 2834,
